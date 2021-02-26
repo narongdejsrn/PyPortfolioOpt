@@ -9,6 +9,7 @@ tags:
 authors:
   - name: Robert Andrew Martin
     orcid: 0000-0002-5225-7700
+affliations:
 date: 25 February 2020
 bibliography: paper.bib
 ---
