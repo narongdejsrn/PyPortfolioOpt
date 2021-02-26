@@ -9,7 +9,10 @@ tags:
 authors:
   - name: Robert Andrew Martin
     orcid: 0000-0002-5225-7700
-affliations:
+    affiliation: 1
+affiliations:
+  - name: University of Cambridge
+    index: 1
 date: 25 February 2020
 bibliography: paper.bib
 ---
