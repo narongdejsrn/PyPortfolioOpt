@@ -37,6 +37,7 @@ class DiscreteAllocation:
         - ``latest_prices`` - pd.Series or dict
         - ``total_portfolio_value`` - int/float
         - ``short_ratio``- float
+        - ``multiple_of``- int
 
     - Output: ``allocation`` - dict
 
@@ -47,7 +48,7 @@ class DiscreteAllocation:
     """
 
     def __init__(
-        self, weights, latest_prices, total_portfolio_value=10000, short_ratio=None
+        self, weights, latest_prices, total_portfolio_value=10000, short_ratio=None, multiple_of=1
     ):
         """
         :param weights: continuous weights generated from the ``efficient_frontier`` module
@@ -59,6 +60,8 @@ class DiscreteAllocation:
         :param short_ratio: the short ratio, e.g 0.3 corresponds to 130/30. If None,
                             defaults to the input weights.
         :type short_ratio: float, defaults to None.
+        :param multiple_of: the multiple of stock that needs, in order to buy
+        :type multiple_of: int, defaults to None.
         :raises TypeError: if ``weights`` is not a dict
         :raises TypeError: if ``latest_prices`` isn't a series
         :raises ValueError: if ``short_ratio < 0``
@@ -82,6 +85,7 @@ class DiscreteAllocation:
             self.short_ratio = sum((-x[1] for x in self.weights if x[1] < 0))
         else:
             self.short_ratio = short_ratio
+        self.multiple_of = multiple_of
 
     @staticmethod
     def _remove_zero_positions(allocation):
@@ -193,6 +197,7 @@ class DiscreteAllocation:
             price = self.latest_prices[ticker]
             # Attempt to buy the lower integer number of shares, which could be zero.
             n_shares = int(weight * self.total_portfolio_value / price)
+            n_shares = int(n_shares / self.multiple_of) * self.multiple_of
             cost = n_shares * price
             # As weights are all > 0 (long only) we always round down n_shares
             # so the cost is always <= simple weighted share of portfolio value,
@@ -237,7 +242,7 @@ class DiscreteAllocation:
                 break
 
             # Buy one share at a time
-            shares_bought[idx] += 1
+            shares_bought[idx] += self.multiple_of
             available_funds -= price
 
         self.allocation = self._remove_zero_positions(
